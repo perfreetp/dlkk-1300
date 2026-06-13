@@ -1,0 +1,112 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  margin-bottom: $spacing-sm;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: $spacing-sm;
+}
+
+.info {
+  flex: 1;
+  margin-right: $spacing-sm;
+}
+
+.name {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+  @include text-ellipsis;
+}
+
+.version {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  margin-top: 4rpx;
+  display: block;
+}
+
+.rating {
+  display: flex;
+  align-items: baseline;
+  background: $gradient-primary;
+  padding: 8rpx 16rpx;
+  border-radius: $radius-button;
+}
+
+.ratingScore {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+}
+
+.ratingLabel {
+  font-size: $font-size-xs;
+  color: $color-text-white;
+  margin-left: 4rpx;
+}
+
+.screenshots {
+  display: flex;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-sm;
+}
+
+.screenshot {
+  flex: 1;
+  height: 160rpx;
+  border-radius: $radius-sm;
+  overflow: hidden;
+}
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+}
+
+.device {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  @include text-ellipsis;
+}
+
+.stats {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  white-space: nowrap;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: $spacing-xs;
+  border-top: 1rpx solid $color-border;
+}
+
+.size {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+}
+
+.author {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}

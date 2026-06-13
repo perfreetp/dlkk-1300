@@ -1,0 +1,35 @@
+// ============================================
+// 主题配色变量（刷机ROM论坛深色科技主题）
+// ============================================
+
+// 品牌主题色（科技蓝 + 渐变紫）
+$color-primary: #1890ff;
+$color-primary-light: #40a9ff;
+$color-primary-dark: #096dd9;
+
+// 功能色
+$color-success: #48bb78;
+$color-warning: #ed8936;
+$color-error: #fc8181;
+$color-info: #1890ff;
+
+// 背景色（深色主题）
+$color-bg-page: #0f0f23;
+$color-bg-card: #1a1a2e;
+$color-bg-hover: #252547;
+$color-bg-deep: #16162a;
+
+// 文本色
+$color-text-primary: #ffffff;
+$color-text-secondary: #a0aec0;
+$color-text-tertiary: #718096;
+$color-text-disabled: #4a5568;
+$color-text-white: #ffffff;
+
+// 边框色
+$color-border: #2d3748;
+$color-divider: #1a1a2e;
+
+// 渐变色
+$gradient-primary: linear-gradient(135deg, #1890ff 0%, #722ed1 100%);
+$gradient-secondary: linear-gradient(135deg, #722ed1 0%, #eb4d4b 100%);

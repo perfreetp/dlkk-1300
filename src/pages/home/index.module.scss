@@ -1,0 +1,97 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding: $page-padding;
+  padding-bottom: 140rpx;
+}
+
+.searchBar {
+  background: $color-bg-card;
+  border-radius: $radius-button;
+  padding: 24rpx $spacing-md;
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.searchIcon {
+  font-size: 32rpx;
+  color: $color-text-tertiary;
+  margin-right: $spacing-sm;
+}
+
+.searchPlaceholder {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}
+
+.section {
+  margin-bottom: $spacing-xl;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.sectionTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+}
+
+.moreLink {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  display: flex;
+  align-items: center;
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.brandGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+}
+
+.brandItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-sm;
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.8;
+    transform: scale(0.95);
+  }
+}
+
+.brandLogo {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-round;
+  margin-bottom: 8rpx;
+}
+
+.brandName {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  @include text-ellipsis;
+  text-align: center;
+}
+
+.deviceList {
+  margin-top: $spacing-sm;
+}

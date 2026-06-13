@@ -1,0 +1,57 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 140rpx;
+}
+
+.filterBar {
+  background: $color-bg-card;
+  padding: $spacing-md $page-padding;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: $shadow-card;
+}
+
+.categoryScroll {
+  white-space: nowrap;
+}
+
+.categoryList {
+  display: inline-flex;
+  gap: $spacing-sm;
+}
+
+.categoryItem {
+  padding: 16rpx 32rpx;
+  border-radius: $radius-button;
+  background: $color-bg-hover;
+  min-width: 120rpx;
+  text-align: center;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.8;
+  }
+
+  &.active {
+    background: $gradient-primary;
+  }
+}
+
+.categoryText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.activeText {
+  color: $color-text-white;
+}
+
+.postList {
+  padding: $page-padding;
+}
