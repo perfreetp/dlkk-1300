@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, ScrollView } from '@tarojs/components';
 import { mockDownloads } from '@/data/mockDownloads';
 import { Download } from '@/types/download';
@@ -6,8 +6,14 @@ import { useMemo } from 'react';
 import styles from './index.module.scss';
 
 const DownloadPage: React.FC = () => {
-  const [downloads, setDownloads] = useState<Download[]>(mockDownloads);
+  const [downloads, setDownloads] = useState<Download[]>(() => 
+    mockDownloads.map(d => ({
+      ...d,
+      packages: d.packages.map(pkg => ({ ...pkg }))
+    }))
+  );
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const intervalRefs = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
   const stats = useMemo(() => ({
     active: downloads.filter(d => ['downloading', 'paused', 'verifying'].includes(d.status)).length,
@@ -15,20 +21,108 @@ const DownloadPage: React.FC = () => {
     failed: downloads.filter(d => d.status === 'failed').length
   }), [downloads]);
 
+  const clearIntervalForDownload = (id: string) => {
+    const interval = intervalRefs.current.get(id);
+    if (interval) {
+      clearInterval(interval);
+      intervalRefs.current.delete(id);
+    }
+  };
+
+  const startProgressSimulation = (id: string) => {
+    clearIntervalForDownload(id);
+    
+    const interval = setInterval(() => {
+      setDownloads(prev => {
+        const download = prev.find(d => d.id === id);
+        if (!download || download.status !== 'downloading') {
+          clearIntervalForDownload(id);
+          return prev;
+        }
+
+        const newProgress = Math.min(download.progress + Math.random() * 5, 100);
+        const allPackagesCompleted = download.packages.every(pkg => {
+          if (pkg.id === download.packages[download.packages.length - 1].id) {
+            return newProgress >= 100;
+          }
+          return pkg.status === 'completed';
+        });
+
+        if (newProgress >= 100) {
+          clearIntervalForDownload(id);
+          return prev.map(d => {
+            if (d.id === id) {
+              return {
+                ...d,
+                progress: 100,
+                status: 'completed' as const,
+                md5Verified: true,
+                completedAt: new Date().toISOString(),
+                packages: d.packages.map((pkg, idx) => ({
+                  ...pkg,
+                  status: 'completed' as const,
+                  progress: 100
+                }))
+              };
+            }
+            return d;
+          });
+        }
+
+        return prev.map(d => {
+          if (d.id === id) {
+            return {
+              ...d,
+              progress: newProgress,
+              packages: d.packages.map((pkg, idx) => {
+                const pkgProgress = (newProgress / d.packages.length) * (idx + 1);
+                return {
+                  ...pkg,
+                  progress: Math.min(pkgProgress, 100),
+                  status: pkgProgress >= 100 ? 'completed' as const : 'downloading' as const
+                };
+              })
+            };
+          }
+          return d;
+        });
+      });
+    }, 500);
+
+    intervalRefs.current.set(id, interval);
+  };
+
+  useEffect(() => {
+    downloads.forEach(d => {
+      if (d.status === 'downloading') {
+        startProgressSimulation(d.id);
+      }
+    });
+
+    return () => {
+      intervalRefs.current.forEach(interval => clearInterval(interval));
+    };
+  }, []);
+
   const handleRetry = (id: string) => {
     setDownloads(prev => prev.map(d => {
       if (d.id === id) {
-        return {
+        const newRetryCount = (d.retryCount || 0) + 1;
+        const updated = {
           ...d,
           status: 'downloading' as const,
           progress: 0,
           errorMessage: undefined,
+          retryCount: newRetryCount,
           packages: d.packages.map(pkg => ({
             ...pkg,
             status: 'downloading' as const,
             progress: 0
           }))
         };
+        
+        setTimeout(() => startProgressSimulation(id), 100);
+        return updated;
       }
       return d;
     }));
@@ -40,6 +134,7 @@ const DownloadPage: React.FC = () => {
   };
 
   const handlePause = (id: string) => {
+    clearIntervalForDownload(id);
     setDownloads(prev => prev.map(d => {
       if (d.id === id) {
         return {
@@ -63,7 +158,7 @@ const DownloadPage: React.FC = () => {
   const handleResume = (id: string) => {
     setDownloads(prev => prev.map(d => {
       if (d.id === id) {
-        return {
+        const updated = {
           ...d,
           status: 'downloading' as const,
           packages: d.packages.map(pkg => ({
@@ -71,6 +166,8 @@ const DownloadPage: React.FC = () => {
             status: 'downloading' as const
           }))
         };
+        setTimeout(() => startProgressSimulation(id), 100);
+        return updated;
       }
       return d;
     }));
@@ -82,6 +179,7 @@ const DownloadPage: React.FC = () => {
   };
 
   const handleDelete = (id: string) => {
+    clearIntervalForDownload(id);
     wx.showModal({
       title: '确认删除',
       content: '确定要删除这个下载任务吗？',
@@ -128,6 +226,9 @@ const DownloadPage: React.FC = () => {
           <View className={styles.info}>
             <Text className={styles.name}>{download.romName}</Text>
             <Text className={styles.version}>{download.deviceName} · v{download.version}</Text>
+            {download.retryCount > 0 && (
+              <Text className={styles.retryCount}>重试 {download.retryCount} 次</Text>
+            )}
           </View>
           <View className={styles.status} style={{ color: statusInfo.color }}>
             <Text className={styles.statusText}>{statusInfo.text}</Text>
@@ -150,7 +251,7 @@ const DownloadPage: React.FC = () => {
               />
             </View>
             <Text className={styles.progressText}>
-              {download.status === 'verifying' ? '正在校验...' : `${download.progress}%`}
+              {download.status === 'verifying' ? '正在校验...' : `${Math.round(download.progress)}%`}
             </Text>
           </View>
         )}
@@ -189,7 +290,7 @@ const DownloadPage: React.FC = () => {
                       </View>
                       <Text className={styles.packageStatus} style={{ color: pkgStatus.color }}>
                         {pkgStatus.text}
-                        {pkg.status === 'downloading' && ` ${pkg.progress}%`}
+                        {pkg.status === 'downloading' && ` ${Math.round(pkg.progress)}%`}
                       </Text>
                     </View>
                   );

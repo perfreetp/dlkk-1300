@@ -11,9 +11,9 @@ const ProfilePage: React.FC = () => {
 
   const menuGroups = [
     {
-      title: '我的内容',
+      title: '我的关注',
       items: [
-        { icon: '&#9733;', title: '我的收藏', subtitle: '0篇收藏', path: '/pages/collection/index' },
+        { icon: '&#9733;', title: '关注机型', subtitle: `${followedCount}个`, path: '/pages/my-follows/index' },
         { icon: '&#128221;', title: '我的发帖', subtitle: '0篇帖子', path: '/pages/myposts/index' },
         { icon: '&#128230;', title: '刷机记录', subtitle: `${recordCount}条记录`, path: '/pages/flash-records/index' }
       ]
@@ -67,6 +67,11 @@ const ProfilePage: React.FC = () => {
       <View className={styles.menuSection}>
         {menuGroups.map((group, groupIndex) => (
           <View key={groupIndex} className={styles.menuGroup}>
+            {group.title && (
+              <View className={styles.groupTitle}>
+                <Text>{group.title}</Text>
+              </View>
+            )}
             {group.items.map((item, itemIndex) => (
               <View
                 key={itemIndex}

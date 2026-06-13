@@ -15,6 +15,7 @@ interface FlashRecordStoreContextType {
   records: FlashRecord[];
   addRecord: (record: Omit<FlashRecord, 'id' | 'createdAt'>) => void;
   deleteRecord: (id: string) => void;
+  updateRecord: (id: string, updates: Partial<FlashRecord>) => void;
   recordCount: number;
 }
 
@@ -57,10 +58,14 @@ export const FlashRecordStoreProvider: React.FC<{ children: ReactNode }> = ({ ch
     });
   };
 
+  const updateRecord = (id: string, updates: Partial<FlashRecord>) => {
+    setRecords(prev => prev.map(r => r.id === id ? { ...r, ...updates } : r));
+  };
+
   const recordCount = records.length;
 
   return (
-    <FlashRecordStoreContext.Provider value={{ records, addRecord, deleteRecord, recordCount }}>
+    <FlashRecordStoreContext.Provider value={{ records, addRecord, deleteRecord, updateRecord, recordCount }}>
       {children}
     </FlashRecordStoreContext.Provider>
   );
@@ -73,6 +78,7 @@ export const useFlashRecordStore = () => {
       records: [],
       addRecord: () => {},
       deleteRecord: () => {},
+      updateRecord: () => {},
       recordCount: 0
     };
   }

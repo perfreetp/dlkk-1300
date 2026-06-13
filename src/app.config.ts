@@ -9,7 +9,8 @@ export default defineAppConfig({
     'pages/rom-detail/index',
     'pages/post-detail/index',
     'pages/settings/index',
-    'pages/flash-records/index'
+    'pages/flash-records/index',
+    'pages/my-follows/index'
   ],
   window: {
     backgroundTextStyle: 'light',

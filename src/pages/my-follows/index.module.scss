@@ -1,0 +1,50 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding: $page-padding;
+}
+
+.header {
+  background: $color-bg-card;
+  padding: $spacing-md;
+  border-radius: $radius-lg;
+  margin-bottom: $spacing-md;
+}
+
+.count {
+  font-size: $font-size-md;
+  color: $color-primary;
+  font-weight: $font-weight-semibold;
+  display: block;
+}
+
+.list {
+  margin-top: $spacing-sm;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 120rpx $spacing-lg;
+}
+
+.emptyIcon {
+  font-size: 120rpx;
+  margin-bottom: $spacing-md;
+  opacity: 0.3;
+}
+
+.emptyText {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: $spacing-sm;
+}
+
+.emptyHint {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  display: block;
+}

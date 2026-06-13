@@ -8,9 +8,46 @@
   padding-bottom: 140rpx;
 }
 
+.filterBar {
+  background: $color-bg-card;
+  padding: $spacing-md $page-padding;
+  display: flex;
+  gap: $spacing-md;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.filterItem {
+  flex: 1;
+}
+
+.filterLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.filterValue {
+  background: $color-bg-hover;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-md;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.arrow {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}
+
 .recordList {
   flex: 1;
-  padding: $page-padding;
+  padding: $spacing-md $page-padding;
 }
 
 .recordCard {
@@ -24,7 +61,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: $spacing-md;
+  margin-bottom: $spacing-sm;
 }
 
 .deviceInfo {
@@ -45,12 +82,22 @@
   display: block;
 }
 
-.deleteBtn {
+.actions {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.actionBtn {
   padding: 8rpx 16rpx;
 
   &:active {
     opacity: 0.7;
   }
+}
+
+.editText {
+  font-size: $font-size-sm;
+  color: $color-primary;
 }
 
 .deleteText {
@@ -178,11 +225,6 @@
   align-items: center;
   font-size: $font-size-md;
   color: $color-text-primary;
-}
-
-.arrow {
-  font-size: $font-size-md;
-  color: $color-text-tertiary;
 }
 
 .notesInput {

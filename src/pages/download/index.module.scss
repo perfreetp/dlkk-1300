@@ -84,6 +84,13 @@
   display: block;
 }
 
+.retryCount {
+  font-size: $font-size-xs;
+  color: $color-warning;
+  margin-top: 4rpx;
+  display: block;
+}
+
 .status {
   display: flex;
   align-items: center;
@@ -153,19 +160,6 @@
   background: $color-bg-hover;
   padding: 4rpx 12rpx;
   border-radius: $radius-xs;
-}
-
-.error {
-  background: rgba(252, 129, 129, 0.1);
-  padding: $spacing-sm;
-  border-radius: $radius-sm;
-  margin-top: $spacing-sm;
-}
-
-.errorText {
-  font-size: $font-size-sm;
-  color: $color-error;
-  display: block;
 }
 
 .quickActions {
