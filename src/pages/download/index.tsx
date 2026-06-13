@@ -10,17 +10,28 @@ const DownloadPage: React.FC = () => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const stats = useMemo(() => ({
-    active: downloads.filter(d => d.status === 'downloading' || d.status === 'paused' || d.status === 'verifying').length,
+    active: downloads.filter(d => ['downloading', 'paused', 'verifying'].includes(d.status)).length,
     completed: downloads.filter(d => d.status === 'completed').length,
     failed: downloads.filter(d => d.status === 'failed').length
   }), [downloads]);
 
   const handleRetry = (id: string) => {
-    setDownloads(prev => prev.map(d =>
-      d.id === id
-        ? { ...d, status: 'downloading' as const, progress: 0, errorMessage: undefined }
-        : d
-    ));
+    setDownloads(prev => prev.map(d => {
+      if (d.id === id) {
+        return {
+          ...d,
+          status: 'downloading' as const,
+          progress: 0,
+          errorMessage: undefined,
+          packages: d.packages.map(pkg => ({
+            ...pkg,
+            status: 'downloading' as const,
+            progress: 0
+          }))
+        };
+      }
+      return d;
+    }));
     wx.showToast({
       title: '开始重试下载',
       icon: 'success',
@@ -29,9 +40,19 @@ const DownloadPage: React.FC = () => {
   };
 
   const handlePause = (id: string) => {
-    setDownloads(prev => prev.map(d =>
-      d.id === id ? { ...d, status: 'paused' as const } : d
-    ));
+    setDownloads(prev => prev.map(d => {
+      if (d.id === id) {
+        return {
+          ...d,
+          status: 'paused' as const,
+          packages: d.packages.map(pkg => ({
+            ...pkg,
+            status: 'paused' as const
+          }))
+        };
+      }
+      return d;
+    }));
     wx.showToast({
       title: '已暂停',
       icon: 'success',
@@ -40,9 +61,19 @@ const DownloadPage: React.FC = () => {
   };
 
   const handleResume = (id: string) => {
-    setDownloads(prev => prev.map(d =>
-      d.id === id ? { ...d, status: 'downloading' as const } : d
-    ));
+    setDownloads(prev => prev.map(d => {
+      if (d.id === id) {
+        return {
+          ...d,
+          status: 'downloading' as const,
+          packages: d.packages.map(pkg => ({
+            ...pkg,
+            status: 'downloading' as const
+          }))
+        };
+      }
+      return d;
+    }));
     wx.showToast({
       title: '继续下载',
       icon: 'success',
@@ -87,6 +118,131 @@ const DownloadPage: React.FC = () => {
   const completedDownloads = downloads.filter(d => d.status === 'completed');
   const failedDownloads = downloads.filter(d => d.status === 'failed');
 
+  const renderDownloadItem = (download: Download) => {
+    const statusInfo = getStatusInfo(download.status);
+    const isExpanded = expandedId === download.id;
+    
+    return (
+      <View key={download.id} className={styles.item}>
+        <View className={styles.header} onClick={() => toggleExpand(download.id)}>
+          <View className={styles.info}>
+            <Text className={styles.name}>{download.romName}</Text>
+            <Text className={styles.version}>{download.deviceName} · v{download.version}</Text>
+          </View>
+          <View className={styles.status} style={{ color: statusInfo.color }}>
+            <Text className={styles.statusText}>{statusInfo.text}</Text>
+            {download.md5Verified && download.status === 'completed' && (
+              <Text className={styles.verifiedBadge}>✓</Text>
+            )}
+            <Text className={styles.expandIcon}>{isExpanded ? '▼' : '▶'}</Text>
+          </View>
+        </View>
+
+        {(download.status === 'downloading' || download.status === 'verifying') && (
+          <View className={styles.progressContainer}>
+            <View className={styles.progressBar}>
+              <View
+                className={styles.progressFill}
+                style={{
+                  width: `${download.status === 'verifying' ? 100 : download.progress}%`,
+                  background: statusInfo.color
+                }}
+              />
+            </View>
+            <Text className={styles.progressText}>
+              {download.status === 'verifying' ? '正在校验...' : `${download.progress}%`}
+            </Text>
+          </View>
+        )}
+
+        <View className={styles.meta}>
+          <Text className={styles.size}>{download.fileSize}</Text>
+          {download.packages.length > 1 && (
+            <Text className={styles.packages}>共{download.packages.length}个分包</Text>
+          )}
+        </View>
+
+        {isExpanded && (
+          <View className={styles.expandedContent}>
+            <View className={styles.md5Section}>
+              <Text className={styles.md5Label}>MD5校验值</Text>
+              <Text className={styles.md5Value} selectable>{download.md5}</Text>
+              {download.status === 'completed' && (
+                <View className={styles.verified}>
+                  <Text className={styles.verifiedText}>
+                    {download.md5Verified ? '✓ MD5校验通过' : '未校验'}
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {download.packages.length > 1 && (
+              <View className={styles.packageList}>
+                <Text className={styles.packageListTitle}>分包详情</Text>
+                {download.packages.map((pkg) => {
+                  const pkgStatus = getStatusInfo(pkg.status);
+                  return (
+                    <View key={pkg.id} className={styles.packageItem}>
+                      <View className={styles.packageInfo}>
+                        <Text className={styles.packageName}>{pkg.name}</Text>
+                        <Text className={styles.packageSize}>{pkg.size}</Text>
+                      </View>
+                      <Text className={styles.packageStatus} style={{ color: pkgStatus.color }}>
+                        {pkgStatus.text}
+                        {pkg.status === 'downloading' && ` ${pkg.progress}%`}
+                      </Text>
+                    </View>
+                  );
+                })}
+              </View>
+            )}
+
+            <View className={styles.actions}>
+              {download.status === 'downloading' && (
+                <View className={styles.actionButton} onClick={() => handlePause(download.id)}>
+                  <Text className={styles.actionText}>暂停</Text>
+                </View>
+              )}
+              {download.status === 'paused' && (
+                <View className={styles.actionButton} onClick={() => handleResume(download.id)}>
+                  <Text className={styles.actionText}>继续</Text>
+                </View>
+              )}
+              {download.status === 'failed' && (
+                <View className={styles.retryButton} onClick={() => handleRetry(download.id)}>
+                  <Text className={styles.retryText}>重试下载</Text>
+                </View>
+              )}
+              <View className={styles.actionButton} onClick={() => handleDelete(download.id)}>
+                <Text className={styles.deleteText}>删除</Text>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {!isExpanded && download.status !== 'completed' && (
+          <View className={styles.quickActions}>
+            {download.status === 'downloading' && (
+              <View className={styles.quickButton} onClick={() => handlePause(download.id)}>
+                <Text className={styles.quickText}>暂停</Text>
+              </View>
+            )}
+            {download.status === 'paused' && (
+              <View className={styles.quickButton} onClick={() => handleResume(download.id)}>
+                <Text className={styles.quickText}>继续</Text>
+              </View>
+            )}
+            {download.status === 'failed' && (
+              <View className={styles.quickButton} onClick={() => handleRetry(download.id)}>
+                <Text className={styles.quickText}>重试</Text>
+              </View>
+            )}
+          </View>
+        )}
+      </View>
+    );
+  };
+
   return (
     <ScrollView
       className={styles.page}
@@ -116,116 +272,7 @@ const DownloadPage: React.FC = () => {
         <>
           <Text className={styles.sectionTitle}>进行中</Text>
           <View className={styles.downloadList}>
-            {activeDownloads.map((download) => {
-              const statusInfo = getStatusInfo(download.status);
-              const isExpanded = expandedId === download.id;
-              return (
-                <View key={download.id} className={styles.item}>
-                  <View className={styles.header} onClick={() => toggleExpand(download.id)}>
-                    <View className={styles.info}>
-                      <Text className={styles.name}>{download.romName}</Text>
-                      <Text className={styles.version}>{download.deviceName} · v{download.version}</Text>
-                    </View>
-                    <View className={styles.status} style={{ color: statusInfo.color }}>
-                      <Text className={styles.statusText}>{statusInfo.text}</Text>
-                      <Text className={styles.expandIcon}>{isExpanded ? '▼' : '▶'}</Text>
-                    </View>
-                  </View>
-
-                  {(download.status === 'downloading' || download.status === 'verifying') && (
-                    <View className={styles.progressContainer}>
-                      <View className={styles.progressBar}>
-                        <View
-                          className={styles.progressFill}
-                          style={{
-                            width: `${download.status === 'verifying' ? 100 : download.progress}%`,
-                            background: statusInfo.color
-                          }}
-                        />
-                      </View>
-                      <Text className={styles.progressText}>
-                        {download.status === 'verifying' ? '正在校验...' : `${download.progress}%`}
-                      </Text>
-                    </View>
-                  )}
-
-                  <View className={styles.meta}>
-                    <Text className={styles.size}>{download.fileSize}</Text>
-                    {download.packages.length > 1 && (
-                      <Text className={styles.packages}>共{download.packages.length}个分包</Text>
-                    )}
-                  </View>
-
-                  {isExpanded && (
-                    <View className={styles.expandedContent}>
-                      <View className={styles.md5Section}>
-                        <Text className={styles.md5Label}>MD5校验值</Text>
-                        <Text className={styles.md5Value} selectable>{download.md5}</Text>
-                        {download.status === 'completed' && (
-                          <View className={styles.verified}>
-                            <Text className={styles.verifiedText}>
-                              {download.md5Verified ? '✓ MD5校验通过' : '未校验'}
-                            </Text>
-                          </View>
-                        )}
-                      </View>
-
-                      {download.packages.length > 1 && (
-                        <View className={styles.packageList}>
-                          <Text className={styles.packageListTitle}>分包详情</Text>
-                          {download.packages.map((pkg) => {
-                            const pkgStatus = getStatusInfo(pkg.status);
-                            return (
-                              <View key={pkg.id} className={styles.packageItem}>
-                                <View className={styles.packageInfo}>
-                                  <Text className={styles.packageName}>{pkg.name}</Text>
-                                  <Text className={styles.packageSize}>{pkg.size}</Text>
-                                </View>
-                                <Text className={styles.packageStatus} style={{ color: pkgStatus.color }}>
-                                  {pkgStatus.text}
-                                  {pkg.status === 'downloading' && ` ${pkg.progress}%`}
-                                </Text>
-                              </View>
-                            );
-                          })}
-                        </View>
-                      )}
-
-                      <View className={styles.actions}>
-                        {download.status === 'downloading' && (
-                          <View className={styles.actionButton} onClick={() => handlePause(download.id)}>
-                            <Text className={styles.actionText}>暂停</Text>
-                          </View>
-                        )}
-                        {download.status === 'paused' && (
-                          <View className={styles.actionButton} onClick={() => handleResume(download.id)}>
-                            <Text className={styles.actionText}>继续</Text>
-                          </View>
-                        )}
-                        <View className={styles.actionButton} onClick={() => handleDelete(download.id)}>
-                          <Text className={styles.deleteText}>删除</Text>
-                        </View>
-                      </View>
-                    </View>
-                  )}
-
-                  {!isExpanded && (
-                    <View className={styles.quickActions}>
-                      {download.status === 'downloading' && (
-                        <View className={styles.quickButton} onClick={() => handlePause(download.id)}>
-                          <Text className={styles.quickText}>暂停</Text>
-                        </View>
-                      )}
-                      {download.status === 'paused' && (
-                        <View className={styles.quickButton} onClick={() => handleResume(download.id)}>
-                          <Text className={styles.quickText}>继续</Text>
-                        </View>
-                      )}
-                    </View>
-                  )}
-                </View>
-              );
-            })}
+            {activeDownloads.map(renderDownloadItem)}
           </View>
         </>
       )}
@@ -234,69 +281,7 @@ const DownloadPage: React.FC = () => {
         <>
           <Text className={styles.sectionTitle}>已完成</Text>
           <View className={styles.downloadList}>
-            {completedDownloads.map((download) => {
-              const statusInfo = getStatusInfo(download.status);
-              const isExpanded = expandedId === download.id;
-              return (
-                <View key={download.id} className={styles.item}>
-                  <View className={styles.header} onClick={() => toggleExpand(download.id)}>
-                    <View className={styles.info}>
-                      <Text className={styles.name}>{download.romName}</Text>
-                      <Text className={styles.version}>{download.deviceName} · v{download.version}</Text>
-                    </View>
-                    <View className={styles.status} style={{ color: statusInfo.color }}>
-                      <Text className={styles.statusText}>{statusInfo.text}</Text>
-                      {download.md5Verified && (
-                        <Text className={styles.verifiedBadge}>✓</Text>
-                      )}
-                      <Text className={styles.expandIcon}>{isExpanded ? '▼' : '▶'}</Text>
-                    </View>
-                  </View>
-
-                  <View className={styles.meta}>
-                    <Text className={styles.size}>{download.fileSize}</Text>
-                    {download.packages.length > 1 && (
-                      <Text className={styles.packages}>共{download.packages.length}个分包</Text>
-                    )}
-                  </View>
-
-                  {isExpanded && (
-                    <View className={styles.expandedContent}>
-                      <View className={styles.md5Section}>
-                        <Text className={styles.md5Label}>MD5校验值</Text>
-                        <Text className={styles.md5Value} selectable>{download.md5}</Text>
-                        <View className={styles.verified}>
-                          <Text className={styles.verifiedText}>
-                            {download.md5Verified ? '✓ MD5校验通过' : '未校验'}
-                          </Text>
-                        </View>
-                      </View>
-
-                      {download.packages.length > 1 && (
-                        <View className={styles.packageList}>
-                          <Text className={styles.packageListTitle}>分包详情</Text>
-                          {download.packages.map((pkg) => (
-                            <View key={pkg.id} className={styles.packageItem}>
-                              <View className={styles.packageInfo}>
-                                <Text className={styles.packageName}>{pkg.name}</Text>
-                                <Text className={styles.packageSize}>{pkg.size}</Text>
-                              </View>
-                              <Text className={styles.packageStatus} style={{ color: '#48bb78' }}>已完成</Text>
-                            </View>
-                          ))}
-                        </View>
-                      )}
-
-                      <View className={styles.actions}>
-                        <View className={styles.actionButton} onClick={() => handleDelete(download.id)}>
-                          <Text className={styles.deleteText}>删除</Text>
-                        </View>
-                      </View>
-                    </View>
-                  )}
-                </View>
-              );
-            })}
+            {completedDownloads.map(renderDownloadItem)}
           </View>
         </>
       )}
@@ -305,63 +290,7 @@ const DownloadPage: React.FC = () => {
         <>
           <Text className={styles.sectionTitle}>失败</Text>
           <View className={styles.downloadList}>
-            {failedDownloads.map((download) => {
-              const statusInfo = getStatusInfo(download.status);
-              const isExpanded = expandedId === download.id;
-              return (
-                <View key={download.id} className={styles.item}>
-                  <View className={styles.header} onClick={() => toggleExpand(download.id)}>
-                    <View className={styles.info}>
-                      <Text className={styles.name}>{download.romName}</Text>
-                      <Text className={styles.version}>{download.deviceName} · v{download.version}</Text>
-                    </View>
-                    <View className={styles.status} style={{ color: statusInfo.color }}>
-                      <Text className={styles.statusText}>{statusInfo.text}</Text>
-                      <Text className={styles.expandIcon}>{isExpanded ? '▼' : '▶'}</Text>
-                    </View>
-                  </View>
-
-                  {download.errorMessage && (
-                    <View className={styles.error}>
-                      <Text className={styles.errorText}>{download.errorMessage}</Text>
-                      {download.retryCount > 0 && (
-                        <Text className={styles.retryText}>已重试{download.retryCount}次</Text>
-                      )}
-                    </View>
-                  )}
-
-                  <View className={styles.meta}>
-                    <Text className={styles.size}>{download.fileSize}</Text>
-                  </View>
-
-                  {isExpanded && (
-                    <View className={styles.expandedContent}>
-                      <View className={styles.md5Section}>
-                        <Text className={styles.md5Label}>MD5校验值</Text>
-                        <Text className={styles.md5Value} selectable>{download.md5}</Text>
-                      </View>
-
-                      <View className={styles.actions}>
-                        <View className={styles.retryButton} onClick={() => handleRetry(download.id)}>
-                          <Text className={styles.retryText}>重试下载</Text>
-                        </View>
-                        <View className={styles.actionButton} onClick={() => handleDelete(download.id)}>
-                          <Text className={styles.deleteText}>删除</Text>
-                        </View>
-                      </View>
-                    </View>
-                  )}
-
-                  {!isExpanded && (
-                    <View className={styles.quickActions}>
-                      <View className={styles.quickButton} onClick={() => handleRetry(download.id)}>
-                        <Text className={styles.quickText}>重试</Text>
-                      </View>
-                    </View>
-                  )}
-                </View>
-              );
-            })}
+            {failedDownloads.map(renderDownloadItem)}
           </View>
         </>
       )}

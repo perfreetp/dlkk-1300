@@ -11,14 +11,18 @@ import styles from './index.module.scss';
 const HomePage: React.FC = () => {
   const [searchValue, setSearchValue] = useState('');
   const [selectedBrand, setSelectedBrand] = useState<string>('');
-  const { devices, followDevice, unfollowDevice } = useDeviceStore();
+  const { devices, followDevice, unfollowDevice, isFollowing } = useDeviceStore();
 
   const mergedDevices = useMemo(() => {
     return mockDevices.map(device => {
       const storeDevice = devices.find(d => d.id === device.id);
-      return storeDevice ? { ...device, ...storeDevice } : device;
+      return {
+        ...device,
+        ...storeDevice,
+        isFollowed: isFollowing(device.id)
+      };
     });
-  }, [devices]);
+  }, [devices, isFollowing]);
 
   const filteredDevices = useMemo(() => {
     let result = mergedDevices;
@@ -64,8 +68,8 @@ const HomePage: React.FC = () => {
     });
   };
 
-  const handleFollowDevice = (deviceId: string, isFollowed: boolean) => {
-    if (isFollowed) {
+  const handleFollowDevice = (deviceId: string) => {
+    if (isFollowing(deviceId)) {
       unfollowDevice(deviceId);
     } else {
       followDevice(deviceId);
@@ -148,7 +152,7 @@ const HomePage: React.FC = () => {
                 key={device.id}
                 device={device}
                 onClick={() => handleDeviceClick(device.id)}
-                onFollow={() => handleFollowDevice(device.id, device.isFollowed)}
+                onFollow={() => handleFollowDevice(device.id)}
               />
             ))}
           </View>

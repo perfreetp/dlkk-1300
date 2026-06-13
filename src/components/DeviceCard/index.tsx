@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Image } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { Device } from '@/types/device';
+import { useDeviceStore } from '@/store/device';
 import styles from './index.module.scss';
 
 interface DeviceCardProps {
@@ -11,6 +12,9 @@ interface DeviceCardProps {
 }
 
 const DeviceCard: React.FC<DeviceCardProps> = ({ device, onClick, onFollow }) => {
+  const { isFollowing } = useDeviceStore();
+  const isFollowed = isFollowing(device.id);
+
   const handleClick = () => {
     if (onClick) onClick();
     else {
@@ -18,6 +22,11 @@ const DeviceCard: React.FC<DeviceCardProps> = ({ device, onClick, onFollow }) =>
         url: `/pages/device-detail/index?id=${device.id}`
       });
     }
+  };
+
+  const handleFollow = (e: any) => {
+    e.stopPropagation();
+    if (onFollow) onFollow();
   };
 
   return (
@@ -37,13 +46,10 @@ const DeviceCard: React.FC<DeviceCardProps> = ({ device, onClick, onFollow }) =>
           <Text className={styles.romCount}>{device.romCount} 个ROM</Text>
           <View
             className={styles.followButton}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (onFollow) onFollow();
-            }}
+            onClick={handleFollow}
           >
-            <Text className={device.isFollowed ? styles.followedText : styles.followText}>
-              {device.isFollowed ? '已关注' : '+ 关注'}
+            <Text className={isFollowed ? styles.followedText : styles.followText}>
+              {isFollowed ? '已关注' : '+ 关注'}
             </Text>
           </View>
         </View>

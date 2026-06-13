@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, Input, Picker } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { useFlashRecordStore } from '@/store/flashRecord';
-import { mockDevices, mockRoms } from '@/data/mockData';
+import { mockDevices } from '@/data/mockDevices';
+import { mockRoms } from '@/data/mockRoms';
 import { formatDate } from '@/utils/format';
 import styles from './index.module.scss';
 
@@ -90,8 +91,8 @@ const FlashRecordsPage: React.FC = () => {
       </ScrollView>
 
       {showForm && (
-        <View className={styles.formOverlay}>
-          <View className={styles.form}>
+        <View className={styles.formOverlay} onClick={() => setShowForm(false)}>
+          <View className={styles.form} onClick={(e) => e.stopPropagation()}>
             <Text className={styles.formTitle}>添加刷机记录</Text>
             
             <View className={styles.formItem}>
@@ -100,10 +101,10 @@ const FlashRecordsPage: React.FC = () => {
                 mode='selector'
                 range={mockDevices}
                 rangeKey='name'
-                onChange={(e) => setDeviceIndex(e.detail.value as number)}
+                onChange={(e) => setDeviceIndex(Number(e.detail.value))}
               >
                 <View className={styles.pickerValue}>
-                  <Text>{mockDevices[deviceIndex]?.name}</Text>
+                  <Text>{mockDevices[deviceIndex]?.name || '请选择'}</Text>
                   <Text className={styles.arrow}>&#8250;</Text>
                 </View>
               </Picker>
@@ -115,10 +116,10 @@ const FlashRecordsPage: React.FC = () => {
                 mode='selector'
                 range={mockRoms}
                 rangeKey='name'
-                onChange={(e) => setRomIndex(e.detail.value as number)}
+                onChange={(e) => setRomIndex(Number(e.detail.value))}
               >
                 <View className={styles.pickerValue}>
-                  <Text>{mockRoms[romIndex]?.name} v{mockRoms[romIndex]?.version}</Text>
+                  <Text>{mockRoms[romIndex]?.name || '请选择'} v{mockRoms[romIndex]?.version || ''}</Text>
                   <Text className={styles.arrow}>&#8250;</Text>
                 </View>
               </Picker>
