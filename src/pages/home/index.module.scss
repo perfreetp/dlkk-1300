@@ -21,10 +21,26 @@
   font-size: 32rpx;
   color: $color-text-tertiary;
   margin-right: $spacing-sm;
+  flex-shrink: 0;
 }
 
-.searchPlaceholder {
+.searchInput {
+  flex: 1;
   font-size: $font-size-md;
+  color: $color-text-primary;
+}
+
+.clearBtn {
+  padding: 8rpx;
+  margin-left: $spacing-sm;
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.clearIcon {
+  font-size: 28rpx;
   color: $color-text-tertiary;
 }
 
@@ -37,6 +53,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: $spacing-md;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
 }
 
 .sectionTitle {
@@ -45,22 +63,37 @@
   color: $color-text-primary;
 }
 
-.moreLink {
-  font-size: $font-size-sm;
-  color: $color-primary;
+.filterTag {
   display: flex;
   align-items: center;
+  background: $gradient-primary;
+  padding: 8rpx 16rpx;
+  border-radius: $radius-button;
+  gap: 8rpx;
 
   &:active {
-    opacity: 0.7;
+    opacity: 0.8;
   }
 }
 
-.brandGrid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+.filterTagText {
+  font-size: $font-size-xs;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}
+
+.filterTagClose {
+  font-size: 20rpx;
+  color: $color-text-white;
+}
+
+.brandScroll {
+  white-space: nowrap;
+}
+
+.brandList {
+  display: inline-flex;
   gap: $spacing-sm;
-  margin-bottom: $spacing-md;
 }
 
 .brandItem {
@@ -70,11 +103,18 @@
   padding: $spacing-sm;
   background: $color-bg-card;
   border-radius: $radius-md;
+  min-width: 140rpx;
   transition: all $transition-base;
+  border: 2rpx solid transparent;
 
   &:active {
     opacity: 0.8;
     transform: scale(0.95);
+  }
+
+  &.brandActive {
+    border-color: $color-primary;
+    background: rgba(24, 144, 255, 0.1);
   }
 }
 
@@ -86,7 +126,7 @@
 }
 
 .brandName {
-  font-size: $font-size-xs;
+  font-size: $font-size-sm;
   color: $color-text-secondary;
   @include text-ellipsis;
   text-align: center;
@@ -94,4 +134,27 @@
 
 .deviceList {
   margin-top: $spacing-sm;
+}
+
+.emptyState {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: 80rpx $spacing-lg;
+  text-align: center;
+}
+
+.emptyText {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}
+
+.moreLink {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  display: flex;
+  align-items: center;
+
+  &:active {
+    opacity: 0.7;
+  }
 }

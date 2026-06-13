@@ -1,16 +1,21 @@
 import React from 'react';
 import { View, Text, Image, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
+import { useDeviceStore } from '@/store/device';
+import { useFlashRecordStore } from '@/store/flashRecord';
 import styles from './index.module.scss';
 
 const ProfilePage: React.FC = () => {
+  const { followedCount } = useDeviceStore();
+  const { recordCount } = useFlashRecordStore();
+
   const menuGroups = [
     {
       title: '我的内容',
       items: [
         { icon: '&#9733;', title: '我的收藏', subtitle: '0篇收藏', path: '/pages/collection/index' },
         { icon: '&#128221;', title: '我的发帖', subtitle: '0篇帖子', path: '/pages/myposts/index' },
-        { icon: '&#128230;', title: '刷机记录', subtitle: '0条记录', path: '/pages/flash-records/index' }
+        { icon: '&#128230;', title: '刷机记录', subtitle: `${recordCount}条记录`, path: '/pages/flash-records/index' }
       ]
     },
     {
@@ -45,7 +50,7 @@ const ProfilePage: React.FC = () => {
         </View>
         <View className={styles.stats}>
           <View className={styles.statItem}>
-            <Text className={styles.statValue}>12</Text>
+            <Text className={styles.statValue}>{followedCount}</Text>
             <Text className={styles.statLabel}>关注机型</Text>
           </View>
           <View className={styles.statItem}>
@@ -53,7 +58,7 @@ const ProfilePage: React.FC = () => {
             <Text className={styles.statLabel}>收藏帖子</Text>
           </View>
           <View className={styles.statItem}>
-            <Text className={styles.statValue}>3</Text>
+            <Text className={styles.statValue}>{recordCount}</Text>
             <Text className={styles.statLabel}>刷机次数</Text>
           </View>
         </View>

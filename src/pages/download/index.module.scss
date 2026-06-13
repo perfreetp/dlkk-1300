@@ -40,10 +40,287 @@
   font-weight: $font-weight-semibold;
   color: $color-text-primary;
   margin-bottom: $spacing-md;
+  display: block;
 }
 
 .downloadList {
   margin-bottom: $spacing-xl;
+}
+
+.item {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  margin-bottom: $spacing-sm;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.info {
+  flex: 1;
+  margin-right: $spacing-md;
+}
+
+.name {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+  @include text-ellipsis;
+}
+
+.version {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-top: 4rpx;
+  display: block;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  flex-shrink: 0;
+}
+
+.statusText {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+.verifiedBadge {
+  font-size: $font-size-sm;
+  color: $color-success;
+}
+
+.expandIcon {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.progressContainer {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin: $spacing-sm 0;
+}
+
+.progressBar {
+  flex: 1;
+  height: 12rpx;
+  background: $color-bg-hover;
+  border-radius: 6rpx;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 6rpx;
+  transition: width 0.3s ease;
+}
+
+.progressText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  min-width: 100rpx;
+  text-align: right;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+  margin-top: $spacing-xs;
+}
+
+.size {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.packages {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  background: $color-bg-hover;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+}
+
+.error {
+  background: rgba(252, 129, 129, 0.1);
+  padding: $spacing-sm;
+  border-radius: $radius-sm;
+  margin-top: $spacing-sm;
+}
+
+.errorText {
+  font-size: $font-size-sm;
+  color: $color-error;
+  display: block;
+}
+
+.quickActions {
+  display: flex;
+  gap: $spacing-sm;
+  justify-content: flex-end;
+  margin-top: $spacing-sm;
+  padding-top: $spacing-sm;
+  border-top: 1rpx solid $color-border;
+}
+
+.quickButton {
+  padding: 12rpx 24rpx;
+  border-radius: $radius-button;
+  background: $color-bg-hover;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.quickText {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.expandedContent {
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1rpx solid $color-border;
+}
+
+.md5Section {
+  background: $color-bg-hover;
+  padding: $spacing-sm;
+  border-radius: $radius-sm;
+  margin-bottom: $spacing-md;
+}
+
+.md5Label {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.md5Value {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  font-family: monospace;
+  word-break: break-all;
+  display: block;
+}
+
+.verified {
+  margin-top: $spacing-xs;
+}
+
+.verifiedText {
+  font-size: $font-size-sm;
+  color: $color-success;
+  font-weight: $font-weight-medium;
+}
+
+.packageList {
+  background: $color-bg-hover;
+  padding: $spacing-sm;
+  border-radius: $radius-sm;
+  margin-bottom: $spacing-md;
+}
+
+.packageListTitle {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+  display: block;
+  margin-bottom: $spacing-sm;
+}
+
+.packageItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-xs 0;
+  border-bottom: 1rpx solid $color-border;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.packageInfo {
+  flex: 1;
+}
+
+.packageName {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  display: block;
+}
+
+.packageSize {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  display: block;
+}
+
+.packageStatus {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+.actions {
+  display: flex;
+  gap: $spacing-sm;
+  justify-content: flex-end;
+}
+
+.actionButton {
+  padding: 12rpx 24rpx;
+  border-radius: $radius-button;
+  background: $color-bg-hover;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.actionText {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.deleteText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.retryButton {
+  padding: 12rpx 24rpx;
+  border-radius: $radius-button;
+  background: $gradient-primary;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.retryText {
+  font-size: $font-size-sm;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
 }
 
 .emptyState {

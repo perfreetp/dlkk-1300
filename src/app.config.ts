@@ -8,7 +8,8 @@ export default defineAppConfig({
     'pages/device-detail/index',
     'pages/rom-detail/index',
     'pages/post-detail/index',
-    'pages/settings/index'
+    'pages/settings/index',
+    'pages/flash-records/index'
   ],
   window: {
     backgroundTextStyle: 'light',
