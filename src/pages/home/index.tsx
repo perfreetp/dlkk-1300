@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { View, Text, ScrollView, Image, Input } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import DeviceCard from '@/components/DeviceCard';
@@ -11,7 +11,14 @@ import styles from './index.module.scss';
 const HomePage: React.FC = () => {
   const [searchValue, setSearchValue] = useState('');
   const [selectedBrand, setSelectedBrand] = useState<string>('');
-  const { devices, followDevice, unfollowDevice, isFollowing } = useDeviceStore();
+  const { devices, followDevice, unfollowDevice, isFollowing, initializePreFollowed } = useDeviceStore();
+
+  useEffect(() => {
+    const preFollowedIds = mockDevices.filter(d => d.isFollowed).map(d => d.id);
+    if (preFollowedIds.length > 0) {
+      initializePreFollowed(preFollowedIds);
+    }
+  }, [initializePreFollowed]);
 
   const mergedDevices = useMemo(() => {
     return mockDevices.map(device => {

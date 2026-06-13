@@ -4,7 +4,6 @@ import Taro from '@tarojs/taro';
 import { useFlashRecordStore } from '@/store/flashRecord';
 import { mockDevices } from '@/data/mockDevices';
 import { mockRoms } from '@/data/mockRoms';
-import { formatDate } from '@/utils/format';
 import styles from './index.module.scss';
 
 const FlashRecordsPage: React.FC = () => {
@@ -13,6 +12,16 @@ const FlashRecordsPage: React.FC = () => {
   const [deviceIndex, setDeviceIndex] = useState(0);
   const [romIndex, setRomIndex] = useState(0);
   const [notes, setNotes] = useState('');
+
+  const formatFullDate = (dateStr: string): string => {
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+  };
 
   const handleAddRecord = () => {
     const device = mockDevices[deviceIndex];
@@ -65,7 +74,7 @@ const FlashRecordsPage: React.FC = () => {
               <View className={styles.recordMeta}>
                 <View className={styles.metaItem}>
                   <Text className={styles.metaLabel}>备份时间</Text>
-                  <Text className={styles.metaValue}>{formatDate(record.backupTime)}</Text>
+                  <Text className={styles.metaValue}>{formatFullDate(record.backupTime)}</Text>
                 </View>
                 <View className={styles.metaItem}>
                   <Text className={styles.metaLabel}>刷入版本</Text>

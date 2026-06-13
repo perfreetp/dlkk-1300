@@ -11,23 +11,34 @@ interface DeviceStoreContextType {
   unfollowDevice: (deviceId: string) => void;
   isFollowing: (deviceId: string) => boolean;
   followedCount: number;
+  initializePreFollowed: (preFollowedIds: string[]) => void;
 }
 
 const DeviceStoreContext = createContext<DeviceStoreContextType | undefined>(undefined);
 
 export const DeviceStoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [devices, setDevices] = useState<DeviceState[]>([]);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     const stored = wx.getStorageSync('deviceStore');
     if (stored) {
       setDevices(JSON.parse(stored));
     }
+    setInitialized(true);
   }, []);
 
   useEffect(() => {
-    wx.setStorageSync('deviceStore', JSON.stringify(devices));
-  }, [devices]);
+    if (initialized && devices.length > 0) {
+      wx.setStorageSync('deviceStore', JSON.stringify(devices));
+    }
+  }, [devices, initialized]);
+
+  const initializePreFollowed = (preFollowedIds: string[]) => {
+    if (devices.length === 0 && preFollowedIds.length > 0) {
+      setDevices(preFollowedIds.map(id => ({ id, isFollowed: true })));
+    }
+  };
 
   const followDevice = (deviceId: string) => {
     setDevices(prev => {
@@ -62,7 +73,7 @@ export const DeviceStoreProvider: React.FC<{ children: ReactNode }> = ({ childre
   const followedCount = devices.filter(d => d.isFollowed).length;
 
   return (
-    <DeviceStoreContext.Provider value={{ devices, followDevice, unfollowDevice, isFollowing, followedCount }}>
+    <DeviceStoreContext.Provider value={{ devices, followDevice, unfollowDevice, isFollowing, followedCount, initializePreFollowed }}>
       {children}
     </DeviceStoreContext.Provider>
   );
@@ -76,7 +87,8 @@ export const useDeviceStore = () => {
       followDevice: () => {},
       unfollowDevice: () => {},
       isFollowing: () => false,
-      followedCount: 0
+      followedCount: 0,
+      initializePreFollowed: () => {}
     };
   }
   return context;
